@@ -1,34 +1,109 @@
-import { Injectable } from '@nestjs/common';
-import { UpdateUserDto } from './dto/update-user.dto.js';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service.js';
-import { User, Prisma } from '../generated/prisma/client.js';
-import { CreateUserDto } from '../_zod/user.js';
-
+import { CreateUserDto, UpdateUserDto } from '../_zod/user.js';
+import { TDefaultResponse } from '../_types/response.js';
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createUserDto: CreateUserDto) {
-    return `Created new user \n\n ${JSON.stringify(createUserDto, null, 4)}`;
+  async create(
+    createUserDto: CreateUserDto,
+  ): Promise<TDefaultResponse & { data: any }> {
+    // return `Created new user \n\n ${JSON.stringify(createUserDto, null, 4)}`;
+    try {
+      const r = await this.prisma.user.create({ data: createUserDto });
+      return {
+        statusCode: 200,
+        message: 'Successfuly created user',
+        isError: false,
+        data: r,
+      };
+    } catch (error: unknown) {
+      throw new BadRequestException('Database creation failed', {
+        cause: error,
+        description:
+          'Database creation failed - await this.prisma.user.create({ data: createUserDto })',
+      });
+    }
   }
 
-  async findAll() {
-    return this.prisma.user.findMany({ take: 10 });
+  async findAll(limit: number) {
+    // console.log('taken limit: ', limit)
+    try {
+      const r = await this.prisma.user.findMany({ take: limit });
+      return {
+        statusCode: 200,
+        message: `Successfuly found all user with limit=${limit}`,
+        isError: false,
+        data: r,
+      };
+    } catch (error: any) {
+      throw new BadRequestException('Database find all failed', {
+        cause: error,
+        description:
+          'Database find all failed - await this.prisma.user.findMany({ take: limit })',
+      });
+    }
   }
 
-  findOne(id: number) {
-    return this.prisma.user.findUniqueOrThrow({
-      where: {
-        id,
-      },
-    });
+  async findOne(id: number) {
+    try {
+      const r = await this.prisma.user.findUniqueOrThrow({
+        where: {
+          id,
+        },
+      });
+      return {
+        statusCode: 200,
+        message: 'Successfuly found user',
+        isError: false,
+        data: r,
+      };
+    } catch (error: any) {
+      throw new BadRequestException('Database find failed', {
+        cause: error,
+        description:
+          'Database find failed - await this.prisma.user.findUniqueOrThrow({...})',
+      });
+    }
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    try {
+      const r = await this.prisma.user.update({
+        data: updateUserDto,
+        where: { id },
+      });
+      return {
+        statusCode: 200,
+        message: 'Successfuly updated user',
+        isError: false,
+        data: r,
+      };
+    } catch (error: unknown) {
+      throw new BadRequestException('Database update failed', {
+        cause: error,
+        description:
+          'Database creation failed - await this.prisma.user.update({...})',
+      });
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    try {
+      const r = await this.prisma.user.delete({ where: { id } });
+      return {
+        statusCode: 200,
+        message: 'Successfuly removed user',
+        isError: false,
+        data: r,
+      };
+    } catch (error) {
+      throw new BadRequestException('Database removal failed', {
+        cause: error,
+        description:
+          'Database removal failed - this.prisma.user.delete({ where: { id } })',
+      });
+    }
   }
 }
