@@ -6,9 +6,10 @@ import { PrismaService } from "./prisma.service.js";
 import { UserService } from "./user.service.js"; 
 import { UserModule } from './user/user.module.js';
 import { CatModule } from './cat/cat.module.js';
+import { AuthModule } from './auth/auth.module.js';
 
 @Module({
-  imports: [ConfigModule.forRoot(), UserModule, CatModule],
+  imports: [ConfigModule.forRoot(), UserModule, CatModule, AuthModule],
   controllers: [AppController],
   providers: [AppService, PrismaService, UserService],
 })

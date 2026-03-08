@@ -19,6 +19,7 @@ import {
   updateUserSchema,
 } from '../_zod/user.js';
 import { ZodValidationPipe } from '../_pipes/validation.pipe.js';
+import { Public } from '../_decorators/public-decorator.js';
 
 @Controller('user')
 export class UserController {
@@ -30,6 +31,7 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
+  @Public()
   @Get()
   findAll(
     @Query('limit', new DefaultValuePipe(999), ParseIntPipe) limit: number,

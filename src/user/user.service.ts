@@ -67,6 +67,27 @@ export class UserService {
       });
     }
   }
+  async findOneByUsername(username: string) {
+    try {
+      const r = await this.prisma.user.findUniqueOrThrow({
+        where: {
+          username,
+        },
+      });
+      return {
+        statusCode: 200,
+        message: 'Successfuly found user by username',
+        isError: false,
+        data: r,
+      };
+    } catch (error: any) {
+      throw new BadRequestException('Database find by username failed', {
+        cause: error,
+        description:
+          'Database find by username failed - await this.prisma.user.findUniqueOrThrow({...})',
+      });
+    }
+  }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     try {
