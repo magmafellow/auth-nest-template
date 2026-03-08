@@ -20,10 +20,11 @@ datasource db {
 //   posts Post[]
 // }
 model User {
-  id    Int     @id @default(autoincrement())
-  firstName String
-  lastName String
-  username String
-  password String
-  dateCreated DateTime
+  id              Int      @id @default(autoincrement())
+  firstName       String
+  lastName        String
+  email           String?
+  username        String   @unique
+  password        String
+  dateTimeCreated DateTime @default(now())
 }

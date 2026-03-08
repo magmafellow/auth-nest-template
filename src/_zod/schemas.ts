@@ -9,3 +9,4 @@ export const createCatSchema = z.object({
 
 
 export type CreateCatDto_Zod = z.infer<typeof createCatSchema>
+
