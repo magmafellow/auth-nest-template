@@ -10,6 +10,7 @@ import {
   UsePipes,
   Query,
   DefaultValuePipe,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service.js';
 import {
@@ -19,7 +20,10 @@ import {
   updateUserSchema,
 } from '../_zod/user.js';
 import { ZodValidationPipe } from '../_pipes/validation.pipe.js';
-import { Public } from '../_decorators/public-decorator.js';
+import { Public } from '../_decorators/public.decorator.js';
+import { Roles } from '../_decorators/roles.decorator.js';
+import { RolesGuard } from '../_guargs/role.guard.js';
+import { Role } from '../_types/role.enum.js';
 
 @Controller('user')
 export class UserController {
@@ -33,6 +37,8 @@ export class UserController {
 
   @Public()
   @Get()
+  @Roles(Role.Admin)
+  @UseGuards(RolesGuard)
   findAll(
     @Query('limit', new DefaultValuePipe(999), ParseIntPipe) limit: number,
   ) {

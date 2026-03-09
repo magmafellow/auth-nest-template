@@ -1,4 +1,4 @@
-import { SetMetadata } from '@nestjs/common';
+import { SetMetadata } from '@nestjs/common.js';
 
 export const IS_PUBLIC_KEY = 'isPublic';
 // Could be named "SkipAuth" or "AllowAnon"
