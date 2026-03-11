@@ -9,13 +9,16 @@ import {
   ParseIntPipe,
   UsePipes,
   ValidationPipe,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CatService } from './cat.service.js';
 import { CreateCatDto } from './dto/create-cat.dto.js';
 import { UpdateCatDto } from './dto/update-cat.dto.js';
 import { MyValidationPipe, ZodValidationPipe } from '../_pipes/validation.pipe.js';
 import { type CreateCatDto_Zod, createCatSchema } from '../_zod/schemas.js';
+import { LoggingInterceptor } from '../_interceptors/logging.interceptor.js';
 
+@UseInterceptors(LoggingInterceptor)
 @Controller('cat')
 export class CatController {
   constructor(private readonly catService: CatService) {}
