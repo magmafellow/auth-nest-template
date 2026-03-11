@@ -6,7 +6,9 @@ import { tap } from 'rxjs/operators';
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    console.log('Before...');
+    console.log('Intercepted...');
+    const r = context.switchToHttp().getRequest()
+    console.log('[intercept info] Original URL: ', r.originalUrl)
 
     const now = Date.now();
     return next
