@@ -10,7 +10,7 @@ const prisma = new PrismaClient({ adapter });
 
 async function main() {
   // Clear existing users first (optional - be careful with this in production!)
-  // await prisma.user.deleteMany({});
+  await prisma.user.deleteMany({});
 
   const users = await Promise.all([
     prisma.user.upsert({

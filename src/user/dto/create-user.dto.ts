@@ -6,5 +6,3 @@ export class CreateUserDto {
   public email?: string
   public dateTimeCreated: Date
 }
-
-
