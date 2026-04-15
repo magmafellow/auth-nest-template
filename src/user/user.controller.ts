@@ -35,7 +35,6 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-  @Public()
   @Get()
   @Roles(Role.Admin)
   @UseGuards(RolesGuard)

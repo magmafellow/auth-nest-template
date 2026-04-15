@@ -27,7 +27,7 @@ export class UserService {
     }
   }
 
-  async findAll(limit: number) {
+  async   findAll(limit: number) {
     // console.log('taken limit: ', limit)
     try {
       const r = await this.prisma.user.findMany({ take: limit });
@@ -67,11 +67,14 @@ export class UserService {
       });
     }
   }
-  async findOneByUsername(username: string) {
+  async findOneByUsername(username: string, withRoles = false) {
     try {
       const r = await this.prisma.user.findUniqueOrThrow({
         where: {
           username,
+        },
+        include: {
+          roles_users: { include: { role: withRoles } },
         },
       });
       return {
@@ -81,6 +84,7 @@ export class UserService {
         data: r,
       };
     } catch (error: any) {
+      console.error(error)
       throw new BadRequestException('Database find by username failed', {
         cause: error,
         description:
