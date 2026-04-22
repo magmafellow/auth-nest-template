@@ -134,9 +134,10 @@ export class CatController_formdata {
     return 'Y';
   }
 
+  @Public()
   @Get()
   findAll() {
-    return this.catService.findAll();
+    return 'All cats returned';
   }
 
   @Get(':id')
