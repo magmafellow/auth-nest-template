@@ -26,10 +26,13 @@ import {
 import { type CreateCatDto_Zod, createCatSchema } from '../_zod/schemas.js';
 import { LoggingInterceptor } from '../_interceptors/logging.interceptor.js';
 import {
+  AnyFilesInterceptor,
   FileFieldsInterceptor,
   FileInterceptor,
 } from '@nestjs/platform-express';
 import { Public } from '../../src/_decorators/public.decorator.js';
+import { diskStorage } from 'multer';
+import { extname, parse } from 'path';
 
 @UseInterceptors(LoggingInterceptor)
 @Controller('cat_formdata')
@@ -44,12 +47,24 @@ export class CatController_formdata {
 
   @Public()
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './upload',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+        },
+      }),
+    }),
+  )
   uploadFile(
     @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 300000 }),
+          new MaxFileSizeValidator({ maxSize: 30000000 }),
           // new FileTypeValidator({ fileType: '' }),
         ],
       }),
@@ -57,30 +72,68 @@ export class CatController_formdata {
     file: Express.Multer.File,
   ) {
     console.log(file);
-    return file.size;
+    console.log(parse(file.originalname).name);
+
+    return { size: file.size, path: file.path, filename: file.filename };
   }
 
   @Public()
   @Post('upload_multiple')
   @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'avatar', maxCount: 3 },
-      { name: 'background' },
-      { name: 'foreground' },
-    ]),
+    FileFieldsInterceptor(
+      [
+        { name: 'avatar', maxCount: 3 },
+        { name: 'background' },
+        { name: 'foreground' },
+      ],
+      {
+        storage: diskStorage({
+          destination: './upload',
+          filename: (req, file, callback) => {
+            const uniqueSuffix =
+              Date.now() + '-' + Math.round(Math.random() * 1e9);
+            const ext = extname(file.originalname);
+            callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+          },
+        }),
+      },
+    ),
   )
   uploadFileMultiple(
     @UploadedFiles()
     files: {
       avatar?: Express.Multer.File[];
-      name?: Express.Multer.File[];
+      background?: Express.Multer.File[];
     },
   ) {
     console.log('files: ', files);
     return 'Y';
   }
 
-  
+  @Public()
+  @Post('upload_any')
+  @UseInterceptors(
+    AnyFilesInterceptor({
+      storage: diskStorage({
+        destination: './upload',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+        },
+      }),
+    }),
+  )
+  uploadFileAny(
+    @UploadedFiles() files: Array<Express.Multer.File>,
+    @Body() formData: any,
+  ) {
+    console.log('files: ', files);
+    console.log('formData: ', formData);
+    return 'Y';
+  }
+
   @Get()
   findAll() {
     return this.catService.findAll();
